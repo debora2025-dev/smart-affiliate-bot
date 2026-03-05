@@ -6,6 +6,7 @@ ChromeProfile/
 WhatsAppProfile/
 __pycache__/
 .vscode/
+*.json
 
 # Arquivos de dados e logs
 historico_precos.csv

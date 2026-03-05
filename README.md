@@ -3,6 +3,7 @@
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Selenium](https://img.shields.io/badge/Selenium-43B02A?style=for-the-badge&logo=selenium&logoColor=white)
 ![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
+
 ![Status](https://img.shields.io/badge/Status-Em%20Produ%C3%A7%C3%A3o-success)
 
 Este é um ecossistema completo de **RPA (Robotic Process Automation)** desenvolvido para automatizar a curadoria, validação e postagem de ofertas em grupos de afiliados (WhatsApp e Telegram). O projeto une técnicas avançadas de Web Scraping com análise de dados para garantir que apenas promoções reais sejam enviadas à comunidade.
