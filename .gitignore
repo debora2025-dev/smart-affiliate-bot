@@ -1,0 +1,19 @@
+# Pastas pesadas de sistema e navegador (NUNCA SUBIR)
+.venv/
+chrome-win64/
+chromedriver-win64/
+ChromeProfile/
+WhatsAppProfile/
+__pycache__/
+.vscode/
+
+# Arquivos de dados e logs
+historico_precos.csv
+*_backup.csv
+cache_envios_24h.json
+shopee_links.txt
+links.txt
+*.log
+
+# Cofre de senhas
+.env

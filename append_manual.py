@@ -1,0 +1,2 @@
+with open(r'c:\Users\Camim\OneDrive\BlackFridayAssistant\rastreador_ofertas.py', 'a', encoding='utf-8') as f:
+    f.write('\n            # Verificacao automatica de links manuais no horario de ALMOCO\n            if GRUPO_ATUAL == "ALMOCO":\n                print("\\n🚀 [AUTO] Processando links manuais da Shopee (Horario de Almoco)...")\n                d_manual = iniciar_driver()\n                try:\n                    processar_shopee_manual(d_manual, set())\n                finally:\n                    if d_manual: d_manual.quit()\n')

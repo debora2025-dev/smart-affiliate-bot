@@ -1,0 +1,68 @@
+=====================================================================
+          CRONOGRAMA DE ATAQUE MANUAL - AUMENTO DE CONVERSÃO
+=====================================================================
+Objetivo: Quebrar o padrão do robô automático e gerar impulsos de compra.
+Use estes comandos no CMD/Terminal nos horários sugeridos.
+
+---------------------------------------------------------------------
+1. O "CAFÉ DA MANHÃ DA FIRMA" (Ticket Baixo)
+---------------------------------------------------------------------
+⏰ Horário: Entre 09:30 e 10:30
+🧠 Psicologia: Pausa rápida no trabalho. A pessoa quer comprar "besteirinhas" baratas.
+🎯 Foco: Produtos até R$ 50,00 ou R$ 100,00 (Impulso).
+
+> COMANDO:
+python script.py RELAMPAGO50
+
+(O robô varre todas as lojas, mas só envia o que for muito barato).
+
+---------------------------------------------------------------------
+2. O "PÓS-ALMOÇO" (Curadoria Visual)
+---------------------------------------------------------------------
+⏰ Horário: Entre 13:30 e 14:00
+🧠 Psicologia: Barriga cheia, rolando o feed no celular. Quer ver coisas bonitas/úteis.
+🎯 Ação: Coloque 3 a 5 links TOPs no arquivo 'shopee_links.txt' (Roupas, Utilidades, Decoração).
+
+> COMANDO:
+python script.py MANUAL
+
+(Envia apenas os links que você escolheu a dedo no arquivo txt).
+
+---------------------------------------------------------------------
+3. O "HAPPY HOUR / TRÂNSITO" (Ofertas Rápidas)
+---------------------------------------------------------------------
+⏰ Horário: Entre 17:30 e 18:30
+🧠 Psicologia: Tédio no ônibus/Uber. A pessoa quer ver promoções relâmpago.
+🎯 Foco: Eletrônicos baratos, acessórios, ofertas do dia.
+
+> COMANDO (Opção 1 - Mercado Livre):
+python script.py ML100
+
+> COMANDO (Opção 2 - Amazon):
+python script.py AMAZON100
+
+---------------------------------------------------------------------
+4. O "MADRUGADÃO GAMER/TECH" (Ticket Médio/Alto)
+---------------------------------------------------------------------
+⏰ Horário: Entre 22:30 e 23:30
+🧠 Psicologia: "Dona de casa" dormiu. Ficaram os Gamers e Techs acordados.
+🎯 Foco: Hardware, Celulares, Games (Sem Eletrodomésticos).
+
+> COMANDO:
+python script.py NOITE --pular ELETRODOMESTICOS --pular CASA
+
+(Roda o turno da noite, mas filtra fora geladeiras e coisas de casa).
+
+=====================================================================
+💡 DICA DE OURO: "LIMPA DE ESTOQUE" (1x por Semana)
+=====================================================================
+Dia sugerido: Quarta ou Quinta-feira.
+
+1. Apague tudo do arquivo 'shopee_links.txt'.
+2. Encha com 10 links de produtos MUITO baratos (menos de R$ 20).
+3. Rode o comando abaixo para misturar seus links com achados automáticos:
+
+> COMANDO:
+python script.py SHOPEE20
+
+=====================================================================

@@ -1,0 +1,47 @@
+============================================================
+       ESTRATEGIA DE POSTAGENS - BLACK FRIDAY ASSISTANT
+============================================================
+
+1. TURNO: MANHA (08:30 - 10:00)
+------------------------------------------------------------
+> Comando: python rastreador_ofertas.py MANHA
+> Foco: Eletroportateis, Beleza, Achadinhos Shopee
+> Objetivo: Itens de rotina e utilidades domesticas.
+------------------------------------------------------------
+
+2. TURNO: ALMOCO (12:00 - 13:30)
+------------------------------------------------------------
+> Comando: python rastreador_ofertas.py ALMOCO
+> Foco: Celulares, Games, Mercado Livre
+> Objetivo: Compras por impulso e tecnologia pessoal.
+------------------------------------------------------------
+
+3. TURNO: TARDE (15:30 - 17:00)
+------------------------------------------------------------
+> Comando: python rastreador_ofertas.py TARDE
+> Foco: Notebooks, Perifericos, Audio
+> Objetivo: Upgrade de setup e produtividade/trabalho.
+------------------------------------------------------------
+
+4. TURNO: NOITE (20:00 - 22:00)
+------------------------------------------------------------
+> Comando: python rastreador_ofertas.py NOITE
+> Foco: Televisoes, Eletrodomesticos, PC Gamer
+> Objetivo: Itens de alto valor e lazer em familia.
+------------------------------------------------------------
+
+5. EXTRA: CUPONS (Qualquer horario - Sugerido 09:00)
+------------------------------------------------------------
+> Comando: python rastreador_ofertas.py --cupons
+> Foco: Ativacao de cupons e descontos diretos
+> Objetivo: Aquecer o publico para as ofertas do dia.
+------------------------------------------------------------
+
+============================================================
+      NOTAS PARA CONFIGURACAO (AGENDADOR DE TAREFAS)
+============================================================
+* Pasta do Projeto: C:\Users\Camim\OneDrive\BlackFridayAssistant
+* Programa: python
+* Argumentos: rastreador_ofertas.py [NOME_DO_GRUPO]
+* Dica: Nao rode o mesmo grupo mais de 2x/dia.
+============================================================
