@@ -1,0 +1,37 @@
+name: CI – Testes de Homologação
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Rodar teste do validador de preços
+        run: python -m pytest testes_homologacao/teste_validador.py -v
+
+      - name: Rodar teste de integração
+        run: python -m pytest testes_homologacao/teste_integracao.py -v
+
+      - name: Verificar importações dos módulos
+        run: |
+          python -c "from utils.validador_preco import analisar_preco, registrar_preco; print('validador_preco: OK')"
+          python -c "from utils.logger import info, error, sucesso; print('logger: OK')"
+          python -c "import schedule; print('schedule: OK')"
