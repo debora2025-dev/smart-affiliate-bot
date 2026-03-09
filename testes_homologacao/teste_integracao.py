@@ -32,7 +32,7 @@ def test_import_logger():
 def test_import_agendador():
     """utils/agendador.py deve importar sem erros"""
     mod = importlib.import_module("utils.agendador")
-    assert hasattr(mod, "configurar_turnos"), "Falta função configurar_turnos"
+    assert hasattr(mod, "agendar_todos"), "Falta função agendar_todos"
 
 
 # ─── 2. DEPENDÊNCIAS EXTERNAS ────────────────────────────────────────────────
@@ -117,7 +117,7 @@ def test_validador_sem_historico_retorna_sem_dados():
     # Título muito específico que certamente não existe no histórico
     resultado = analisar_preco("ProdutoTesteIntegracao_XYZ_12345_Inexistente", 100.00)
     assert resultado["oportunidade"] is False, "Sem histórico não deve ser marcado como oportunidade"
-    assert "sem" in resultado["veredito"].lower() or "dados" in resultado["veredito"].lower() or "histór" in resultado["veredito"].lower()
+    assert resultado["preco_medio"] == 0.0, "Sem histórico, preco_medio deve ser 0.0"
 
 
 # ─── 5. LOGGER ────────────────────────────────────────────────────────────────
@@ -129,7 +129,7 @@ def test_logger_nao_lanca_excecao():
     # Deve executar sem erros (pode criar arquivo de log)
     logger.info("Teste de integração – info")
     logger.sucesso("Teste de integração – sucesso")
-    logger.erro("Teste de integração – erro (esperado em teste)")
+    logger.error("Teste de integração – erro (esperado em teste)")
 
 
 if __name__ == "__main__":
