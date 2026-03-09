@@ -89,7 +89,7 @@ def teste_preco_normal_sem_alerta():
 
     pd.DataFrame(registros).to_csv(HIST_TEMP, index=False)
 
-    res = v.analisar_preco("Mouse Logitech G203", 148.0)  # Praticamente igual à média
+    res = v.analisar_preco("Mouse Logitech G203", 155.0)  # Acima da média (min*1.02=153): não é oportunidade
 
     assert not res["oportunidade"], "Esperava oportunidade=False para preço normal"
     _ok("Preço normal não gera alerta falso")
