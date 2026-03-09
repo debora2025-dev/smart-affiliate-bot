@@ -10,11 +10,13 @@ __pycache__/
 
 # Arquivos de dados e logs
 historico_precos.csv
+historico_ofertas.csv
 *_backup.csv
-cache_envios_24h.json
+cache_envios_24h*.json
 shopee_links.txt
 links.txt
 *.log
+logs/
 
 # Cofre de senhas
 .env

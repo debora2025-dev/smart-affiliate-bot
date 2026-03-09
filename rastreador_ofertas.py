@@ -129,6 +129,8 @@ def formatar_preco_br(preco):
 
 # --- ANÁLISE DE DADOS E CACHE ---
 
+ARQUIVO_CACHE_ENVIOS = "cache_envios_24h.json"
+
 def carregar_cache():
     if not os.path.exists(ARQUIVO_CACHE_ENVIOS): return {}
     try:
@@ -140,13 +142,8 @@ def salvar_cache(cache):
     with open(ARQUIVO_CACHE_ENVIOS, 'w', encoding='utf-8') as f:
             json.dump(cache, f, indent=4, ensure_ascii=False)
 
-def verificar_se_ja_enviou_24h(titulo, grupo=None):
-    chave = f"{grupo}::{titulo.strip().lower()}" if grupo else titulo.strip().lower()
-    cache = carregar_cache()
-    cache[chave] = time.time()
-    salvar_cache(cache)
-
 def atualizar_historico(arquivo_csv, titulo, preco_coletado):
+    preco = preco_coletado
     if not preco or preco <= 0: return
     data_hoje = datetime.now().strftime("%Y-%m-%d")
     nova_linha = pd.DataFrame([{'Data': data_hoje, 'Preco': preco, 'Produto': titulo}])

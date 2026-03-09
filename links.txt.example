@@ -1,0 +1,19 @@
+# links.txt — Template para o modo MANUAL
+# ─────────────────────────────────────────────────────────────────
+# Formato:  URL_PRODUTO "URL_AFILIADO"
+# Se não tiver link de afiliado separado, coloque só a URL do produto.
+#
+# Linhas começando com # são ignoradas.
+# ─────────────────────────────────────────────────────────────────
+
+# AMAZON (com tag de afiliado)
+https://www.amazon.com.br/dp/B0EXEMPLO1/ "https://amzn.to/SeuLinkAfiliado"
+
+# MERCADO LIVRE
+https://www.mercadolivre.com.br/produto/exemplo/p/ML123456789 "https://meli.la/SeuLinkAfiliado"
+
+# MAGAZINE LUIZA
+https://www.magazineluiza.com.br/produto-exemplo/p/123456789/ "https://www.magazinevoce.com.br/magazinesualoja/p/123456789/"
+
+# SHOPEE (use o link de afiliado diretamente)
+https://shope.ee/SeuLinkAfiliado "https://shope.ee/SeuLinkAfiliado"
