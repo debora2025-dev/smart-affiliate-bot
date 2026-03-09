@@ -4,7 +4,8 @@ selenium
 webdriver-manager
 beautifulsoup4
 pillow
-pyperclip
-pywin32
+pyperclip; sys_platform == "win32"
+pywin32; sys_platform == "win32"
 python-dotenv
 schedule
+pytest
