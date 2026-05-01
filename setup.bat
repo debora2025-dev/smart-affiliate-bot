@@ -14,14 +14,48 @@ echo.
 :: 1. Verificar Python
 :: ------------------------------------------------------------------
 echo [1/6] Verificando Python...
+set PYTHON_EXE=
+
+:: Tenta comando direto
 python --version >nul 2>&1
-if errorlevel 1 (
-    echo  ERRO: Python nao encontrado. Instale em https://python.org/downloads/
-    pause
-    exit /b 1
+if not errorlevel 1 (
+    set PYTHON_EXE=python
+    goto :python_ok
 )
-for /f "tokens=*" %%V in ('python --version 2^>^&1') do set PYVER=%%V
-echo  OK: %PYVER%
+
+:: Tenta launcher 'py' (instalador oficial Windows)
+py --version >nul 2>&1
+if not errorlevel 1 (
+    set PYTHON_EXE=py
+    goto :python_ok
+)
+
+:: Procura nas pastas comuns de instalacao
+for %%D in (
+    "%LOCALAPPDATA%\Python\pythoncore-3.14-64\python.exe"
+    "%LOCALAPPDATA%\Python\pythoncore-3.13-64\python.exe"
+    "%LOCALAPPDATA%\Python\pythoncore-3.12-64\python.exe"
+    "%LOCALAPPDATA%\Programs\Python\Python314\python.exe"
+    "%LOCALAPPDATA%\Programs\Python\Python313\python.exe"
+    "%LOCALAPPDATA%\Programs\Python\Python312\python.exe"
+    "C:\Python314\python.exe"
+    "C:\Python313\python.exe"
+) do (
+    if exist %%D (
+        set PYTHON_EXE=%%~D
+        goto :python_ok
+    )
+)
+
+echo  ERRO: Python nao encontrado.
+echo  Solucao: Reinstale o Python marcando "Add Python to PATH"
+echo  Download: https://python.org/downloads/
+pause
+exit /b 1
+
+:python_ok
+for /f "tokens=*" %%V in ('"%PYTHON_EXE%" --version 2^>^&1') do set PYVER=%%V
+echo  OK: %PYVER% [%PYTHON_EXE%]
 
 :: ------------------------------------------------------------------
 :: 2. Criar ambiente virtual
@@ -29,7 +63,7 @@ echo  OK: %PYVER%
 echo.
 echo [2/6] Criando ambiente virtual (.venv)...
 if not exist ".venv" (
-    python -m venv .venv
+    "%PYTHON_EXE%" -m venv .venv
     echo  OK: Ambiente virtual criado em .venv\
 ) else (
     echo  OK: Ambiente virtual ja existe.
@@ -68,7 +102,7 @@ if not exist ".env" (
 :: ------------------------------------------------------------------
 echo.
 echo [5/6] Rodando testes de homologacao...
-python -m pytest testes_homologacao\teste_validador.py -v --tb=short 2>&1
+"%PYTHON_EXE%" -m pytest testes_homologacao\teste_validador.py -v --tb=short 2>&1
 if errorlevel 1 (
     echo  AVISO: Alguns testes falharam. Verifique a saida acima.
 ) else (
