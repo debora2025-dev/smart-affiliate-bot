@@ -1317,27 +1317,53 @@ def processar_shopee_manual(driver, produtos_processados_set, preco_maximo=None)
 
 def gerar_link_amazon_sitestripe(driver):
     print("| 🔗 AMAZON: Iniciando captura SiteStripe...")
-    
-    try:
-        time.sleep(4) 
 
+    def _tentar_clicar_botao(ctx):
+        """Tenta clicar no botão SiteStripe no contexto atual (página ou iframe)."""
         try:
-            print("| Procurando botão ID: 'amzn-ss-get-link-button'...")
-            
-            botao = WebDriverWait(driver, 10).until(
+            botao = WebDriverWait(ctx, 8).until(
                 EC.element_to_be_clickable((By.ID, "amzn-ss-get-link-button"))
             )
-            
-            driver.execute_script("arguments[0].click();", botao)
-            print("| ✅ Botão CLICADO com sucesso!")
-            
-        except Exception as e:
-            print(f"| ❌ Erro ao clicar no botão: {e}")
-            try:
-                driver.find_element(By.ID, "amzn-ss-text-link").click()
-            except: pass
+            ctx.execute_script("arguments[0].scrollIntoView(true);", botao)
+            time.sleep(0.5)
+            ctx.execute_script("arguments[0].click();", botao)
+            return True
+        except Exception:
+            return False
+
+    try:
+        time.sleep(4)
+
+        clicou = False
+
+        # 1. Tenta direto na página principal
+        print("| Procurando botão ID: 'amzn-ss-get-link-button'...")
+        clicou = _tentar_clicar_botao(driver)
+
+        # 2. SiteStripe pode estar dentro de um iframe — tenta cada um
+        if not clicou:
+            print("| Botão não encontrado na página — buscando em iframes...")
+            iframes = driver.find_elements(By.TAG_NAME, "iframe")
+            for iframe in iframes:
+                try:
+                    driver.switch_to.frame(iframe)
+                    clicou = _tentar_clicar_botao(driver)
+                    if clicou:
+                        print("| Botão encontrado dentro de iframe.")
+                        break
+                    driver.switch_to.default_content()
+                except Exception:
+                    driver.switch_to.default_content()
+
+        if not clicou:
+            driver.switch_to.default_content()
+            print("| ❌ Botão SiteStripe não encontrado. Verifique se o toolbar laranja da Amazon aparece no Chrome.")
+            print("|    Certifique-se de estar logado como Associado Amazon na sessão de debug (porta 9222).")
             return None
 
+        print("| ✅ Botão CLICADO com sucesso!")
+
+        # 3. Captura o link gerado
         try:
             caixa = WebDriverWait(driver, 8).until(
                 EC.visibility_of_element_located((By.CSS_SELECTOR, "#amzn-ss-text-shortlink-textarea, textarea[id*='shortlink']"))
@@ -1347,17 +1373,22 @@ def gerar_link_amazon_sitestripe(driver):
 
             if link_curto and "amzn.to" in link_curto:
                 print(f"| 🎯 LINK CAPTURADO: {link_curto}")
-                
                 try:
                     driver.execute_script("document.querySelector('button[class*=\"close-popover\"]').click()")
                 except: pass
-                
                 return link_curto
-        except:
-            print("| ❌ Botão clicado, mas a caixa de link não apareceu.")
-            
+
+            print("| ❌ Botão clicado, mas a caixa de link não apareceu ou link inválido.")
+        except Exception:
+            print("| ❌ Timeout aguardando caixa de link após clique.")
+
     except Exception as e:
         print(f"| ❌ Falha técnica no SiteStripe: {e}")
+    finally:
+        try:
+            driver.switch_to.default_content()
+        except Exception:
+            pass
 
     return None
 
