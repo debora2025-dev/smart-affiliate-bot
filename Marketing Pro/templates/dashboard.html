@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marketing Pro — Dashboard de Leads Qualificados</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">MP</span>
+        <div>
+          <h1>Marketing Pro</h1>
+          <p>Leads qualificados &amp; prospecção ativa — Meta · Google · LinkedIn · TikTok</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div id="platform-status" class="platform-status" aria-label="Status das integrações"></div>
+        <span id="generated-at" class="generated-at"></span>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="kpi-row" id="kpi-row" aria-label="Indicadores principais"></section>
+
+      <section class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h2>Funil de fechamento</h2>
+            <span class="card-sub">Do lead novo até o fechamento, por etapa</span>
+          </div>
+          <canvas id="chart-funnel" height="220"></canvas>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Prospecção por plataforma</h2>
+            <span class="card-sub">Leads recebidos vs. em prospecção ativa</span>
+          </div>
+          <canvas id="chart-prospecting" height="220"></canvas>
+        </div>
+      </section>
+
+      <section class="grid-3">
+        <div class="card">
+          <div class="card-header">
+            <h2>Recuperação de leads</h2>
+            <span class="card-sub">Leads perdidos reabordados com sucesso</span>
+          </div>
+          <div class="stat-block">
+            <div class="stat-big" id="recovery-rate">–</div>
+            <div class="stat-caption">taxa de recuperação</div>
+          </div>
+          <ul class="mini-list" id="recovery-list"></ul>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Revisão de e-mails</h2>
+            <span class="card-sub">Fila de aprovação e performance de envio</span>
+          </div>
+          <div class="stat-block">
+            <div class="stat-big" id="email-pending">–</div>
+            <div class="stat-caption">aguardando revisão</div>
+          </div>
+          <ul class="mini-list" id="email-list"></ul>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Calendário</h2>
+            <span class="card-sub">Compromissos dos próximos 7 dias</span>
+          </div>
+          <div class="stat-block">
+            <div class="stat-big" id="calendar-count">–</div>
+            <div class="stat-caption">reuniões agendadas</div>
+          </div>
+          <ul class="mini-list" id="calendar-list"></ul>
+        </div>
+      </section>
+
+      <section class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h2>Vendas</h2>
+            <span class="card-sub">Receita fechada por plataforma (30 dias)</span>
+          </div>
+          <canvas id="chart-sales" height="220"></canvas>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Negócios recentes</h2>
+            <span class="card-sub">Últimos fechamentos registrados</span>
+          </div>
+          <table class="data-table" id="sales-table">
+            <thead>
+              <tr><th>Lead</th><th>Plataforma</th><th>Valor</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>Leads recentes</h2>
+          <span class="card-sub">Últimos leads recebidos em todas as plataformas</span>
+        </div>
+        <table class="data-table" id="leads-table">
+          <thead>
+            <tr>
+              <th>Nome</th><th>Plataforma</th><th>Campanha</th><th>Etapa</th><th>Score</th><th>Recebido em</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
