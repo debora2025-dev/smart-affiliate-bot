@@ -163,3 +163,38 @@ body {
 .badge.tiktok { background: var(--tiktok); }
 
 .stage-pill { padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; background: var(--primary-soft); color: var(--primary); }
+
+.error-banner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .error-banner { background: #2a1414; border-color: #5c2323; color: #fca5a5; }
+}
+:root[data-theme="dark"] .error-banner { background: #2a1414; border-color: #5c2323; color: #fca5a5; }
+
+.chart-box { display: flex; flex-direction: column; gap: 10px; }
+.chart-error { font-size: 12px; color: var(--text-muted); padding: 12px 0; }
+
+.bar-row { display: grid; grid-template-columns: 110px 1fr 56px; align-items: center; gap: 10px; font-size: 13px; }
+.bar-track { background: var(--primary-soft); border-radius: 6px; height: 20px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 6px; background: var(--primary); transition: width 0.3s ease; }
+.bar-value { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-muted); }
+.bar-label { color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.grouped-bars { display: flex; align-items: flex-end; justify-content: space-around; gap: 16px; height: 180px; padding: 6px 4px 0; }
+.grouped-bar-col { height: 100%; flex: 1; display: flex; flex-direction: column; align-items: center; }
+.grouped-bar-set { display: flex; align-items: flex-end; justify-content: center; gap: 5px; flex: 1; width: 100%; }
+.grouped-bar { width: 22px; border-radius: 4px 4px 0 0; }
+.grouped-bar-group-label { text-align: center; font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+
+.legend-row { display: flex; flex-wrap: wrap; gap: 10px 16px; font-size: 12px; color: var(--text-muted); }
+.legend-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+
+.stacked-bar { display: flex; height: 22px; border-radius: 6px; overflow: hidden; background: var(--primary-soft); }
+.stacked-segment { height: 100%; }

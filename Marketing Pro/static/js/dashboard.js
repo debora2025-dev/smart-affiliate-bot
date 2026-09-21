@@ -1,3 +1,9 @@
+// Todos os gráficos aqui são HTML/CSS puro — sem dependência de CDN externo.
+// Isso evita que uma rede corporativa, firewall ou antivírus bloqueando um
+// script de terceiros derrube o dashboard inteiro (a causa do "localhost abre
+// mas fica em branco"). Cada seção também é renderizada dentro do seu próprio
+// try/catch, então uma falha isolada nunca impede as demais seções de aparecer.
+
 const PLATFORM_LABEL = {
   meta: "Meta",
   google: "Google",
@@ -5,11 +11,12 @@ const PLATFORM_LABEL = {
   tiktok: "TikTok",
 };
 
+// Paleta categórica validada (CVD-safe) — ordem fixa, nunca ciclada.
 const PLATFORM_COLOR = {
-  meta: "#1877f2",
-  google: "#ea4335",
-  linkedin: "#0a66c2",
-  tiktok: "#25293c",
+  meta: "#2a78d6", // slot 1 · blue
+  google: "#eb6834", // slot 2 · orange
+  linkedin: "#1baf7a", // slot 3 · aqua
+  tiktok: "#eda100", // slot 4 · yellow
 };
 
 function fmtCurrency(value) {
@@ -20,14 +27,23 @@ function fmtDateTime(iso) {
   return new Date(iso).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
 }
 
+function el(tag, attrs = {}, children = []) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(attrs)) {
+    if (key === "className") node.className = value;
+    else node.setAttribute(key, value);
+  }
+  for (const child of children) node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
+  return node;
+}
+
 function renderStatus(statusMap) {
-  const el = document.getElementById("platform-status");
-  el.innerHTML = "";
+  const container = document.getElementById("platform-status");
+  container.innerHTML = "";
   Object.entries(statusMap).forEach(([key, info]) => {
-    const chip = document.createElement("span");
-    chip.className = "status-chip";
+    const chip = el("span", { className: "status-chip" });
     chip.innerHTML = `<span class="status-dot ${info.connected ? "connected" : "demo"}"></span>${PLATFORM_LABEL[key] || key} · ${info.connected ? "API real" : "demo"}`;
-    el.appendChild(chip);
+    container.appendChild(chip);
   });
 }
 
@@ -43,78 +59,123 @@ function renderKpis(data) {
   const row = document.getElementById("kpi-row");
   row.innerHTML = "";
   kpis.forEach((kpi) => {
-    const card = document.createElement("div");
-    card.className = "kpi-card";
-    card.innerHTML = `<div class="kpi-label">${kpi.label}</div><div class="kpi-value">${kpi.value}</div>`;
-    row.appendChild(card);
+    row.appendChild(
+      el("div", { className: "kpi-card" }, [
+        el("div", { className: "kpi-label" }, [kpi.label]),
+        el("div", { className: "kpi-value" }, [String(kpi.value)]),
+      ])
+    );
+  });
+}
+
+// Barras horizontais (usadas no funil: uma série, valores em ordem decrescente).
+function renderHorizontalBars(containerId, rows, valueFormatter = (v) => String(v)) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+  const max = Math.max(1, ...rows.map((r) => r.value));
+  rows.forEach((row) => {
+    const pct = Math.max(2, Math.round((row.value / max) * 100));
+    const bar = el("div", { className: "bar-row", title: `${row.label}: ${valueFormatter(row.value)}` }, [
+      el("span", { className: "bar-label" }, [row.label]),
+      el("div", { className: "bar-track" }, [el("div", { className: "bar-fill", style: `width:${pct}%` })]),
+      el("span", { className: "bar-value" }, [valueFormatter(row.value)]),
+    ]);
+    container.appendChild(bar);
   });
 }
 
 function renderFunnelChart(funnel) {
-  new Chart(document.getElementById("chart-funnel"), {
-    type: "bar",
-    data: {
-      labels: funnel.stages.map((s) => s.label),
-      datasets: [
-        {
-          label: "Leads que chegaram a essa etapa (ou além)",
-          data: funnel.stages.map((s) => s.reached_or_beyond),
-          backgroundColor: "#4f46e5",
-          borderRadius: 6,
-        },
-      ],
-    },
-    options: {
-      indexAxis: "y",
-      plugins: { legend: { display: false } },
-      scales: { x: { beginAtZero: true, grid: { display: false } }, y: { grid: { display: false } } },
-    },
+  renderHorizontalBars(
+    "chart-funnel",
+    funnel.stages.map((s) => ({ label: s.label, value: s.reached_or_beyond })),
+  );
+}
+
+// Barras verticais agrupadas (duas séries por categoria — prospecção por plataforma).
+function renderGroupedBars(containerId, categories, series) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = "";
+  const max = Math.max(1, ...series.flatMap((s) => s.values));
+  const chart = el("div", { className: "grouped-bars" });
+  categories.forEach((label, idx) => {
+    const barsWrap = el("div", { className: "grouped-bar-set" });
+    series.forEach((s) => {
+      const value = s.values[idx];
+      const heightPct = Math.max(2, Math.round((value / max) * 100));
+      barsWrap.appendChild(
+        el("div", {
+          className: "grouped-bar",
+          style: `height:${heightPct}%; background:${s.color}`,
+          title: `${s.label} — ${label}: ${value}`,
+        })
+      );
+    });
+    const col = el("div", { className: "grouped-bar-col" }, [barsWrap, el("div", { className: "grouped-bar-group-label" }, [label])]);
+    chart.appendChild(col);
   });
+
+  const legend = el(
+    "div",
+    { className: "legend-row" },
+    series.map((s) => {
+      const item = el("span", {});
+      item.innerHTML = `<span class="legend-swatch" style="background:${s.color}"></span>${s.label}`;
+      return item;
+    })
+  );
+
+  container.appendChild(chart);
+  container.appendChild(legend);
 }
 
 function renderProspectingChart(prospeccao) {
   const rows = prospeccao.por_plataforma;
-  new Chart(document.getElementById("chart-prospecting"), {
-    type: "bar",
-    data: {
-      labels: rows.map((r) => r.label),
-      datasets: [
-        {
-          label: "Total de leads",
-          data: rows.map((r) => r.total_leads),
-          backgroundColor: rows.map((r) => PLATFORM_COLOR[r.platform]),
-          borderRadius: 6,
-        },
-        {
-          label: "Em prospecção ativa",
-          data: rows.map((r) => r.leads_ativos_em_prospeccao),
-          backgroundColor: "#c7d2fe",
-          borderRadius: 6,
-        },
-      ],
-    },
-    options: {
-      plugins: { legend: { position: "bottom" } },
-      scales: { y: { beginAtZero: true, grid: { color: "#eef0f6" } }, x: { grid: { display: false } } },
-    },
-  });
+  renderGroupedBars(
+    "chart-prospecting",
+    rows.map((r) => r.label),
+    [
+      { label: "Total de leads", color: "#4f46e5", values: rows.map((r) => r.total_leads) },
+      { label: "Em prospecção ativa", color: "#c7d2fe", values: rows.map((r) => r.leads_ativos_em_prospeccao) },
+    ]
+  );
 }
 
+// Barra 100% empilhada + legenda (participação de cada plataforma na receita).
 function renderSalesChart(vendas) {
+  const container = document.getElementById("chart-sales");
+  container.innerHTML = "";
   const entries = Object.entries(vendas.por_plataforma);
-  new Chart(document.getElementById("chart-sales"), {
-    type: "doughnut",
-    data: {
-      labels: entries.map(([key]) => PLATFORM_LABEL[key] || key),
-      datasets: [
-        {
-          data: entries.map(([, v]) => v.receita),
-          backgroundColor: entries.map(([key]) => PLATFORM_COLOR[key]),
-        },
-      ],
-    },
-    options: { plugins: { legend: { position: "bottom" } } },
+  const total = entries.reduce((sum, [, v]) => sum + v.receita, 0);
+
+  if (!entries.length || total <= 0) {
+    container.appendChild(el("div", { className: "chart-error" }, ["Sem vendas fechadas no período."]));
+    return;
+  }
+
+  const stacked = el("div", { className: "stacked-bar" });
+  entries.forEach(([key, v]) => {
+    const pct = (v.receita / total) * 100;
+    stacked.appendChild(
+      el("div", {
+        className: "stacked-segment",
+        style: `width:${pct}%; background:${PLATFORM_COLOR[key] || "#999"}`,
+        title: `${PLATFORM_LABEL[key] || key}: ${fmtCurrency(v.receita)} (${pct.toFixed(1)}%)`,
+      })
+    );
   });
+
+  const legend = el(
+    "div",
+    { className: "legend-row" },
+    entries.map(([key, v]) => {
+      const item = el("span", {});
+      item.innerHTML = `<span class="legend-swatch" style="background:${PLATFORM_COLOR[key] || "#999"}"></span>${PLATFORM_LABEL[key] || key} — ${fmtCurrency(v.receita)}`;
+      return item;
+    })
+  );
+
+  container.appendChild(stacked);
+  container.appendChild(legend);
 }
 
 function renderRecovery(recuperacao) {
@@ -123,7 +184,7 @@ function renderRecovery(recuperacao) {
   list.innerHTML = "";
   recuperacao.eventos_recentes.forEach((item) => {
     const li = document.createElement("li");
-    li.innerHTML = `<span>${item.lead_name}<span class="mini-sub">${item.recovery_channel}</span></span><span class="badge ${item.platform}">${PLATFORM_LABEL[item.platform]}</span>`;
+    li.innerHTML = `<span>${item.lead_name}<span class="mini-sub">${item.recovery_channel}</span></span><span class="badge" style="background:${PLATFORM_COLOR[item.platform] || "#999"}">${PLATFORM_LABEL[item.platform] || item.platform}</span>`;
     list.appendChild(li);
   });
 }
@@ -155,7 +216,7 @@ function renderSalesTable(vendas) {
   tbody.innerHTML = "";
   vendas.negocios_recentes.forEach((deal) => {
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td>${deal.lead_name}</td><td><span class="badge ${deal.platform}">${PLATFORM_LABEL[deal.platform]}</span></td><td>${fmtCurrency(deal.valor)}</td>`;
+    tr.innerHTML = `<td>${deal.lead_name}</td><td><span class="badge" style="background:${PLATFORM_COLOR[deal.platform] || "#999"}">${PLATFORM_LABEL[deal.platform] || deal.platform}</span></td><td>${fmtCurrency(deal.valor)}</td>`;
     tbody.appendChild(tr);
   });
 }
@@ -167,7 +228,7 @@ function renderLeadsTable(leads) {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${lead.name}</td>
-      <td><span class="badge ${lead.platform}">${PLATFORM_LABEL[lead.platform]}</span></td>
+      <td><span class="badge" style="background:${PLATFORM_COLOR[lead.platform] || "#999"}">${PLATFORM_LABEL[lead.platform] || lead.platform}</span></td>
       <td>${lead.campaign}</td>
       <td><span class="stage-pill">${lead.stage}</span></td>
       <td>${lead.score}</td>
@@ -177,21 +238,56 @@ function renderLeadsTable(leads) {
   });
 }
 
+// Roda cada seção isoladamente: se uma falhar (por exemplo, um campo inesperado
+// na resposta da API), registra no console e mostra um aviso discreto no lugar
+// da seção — sem impedir que o restante do dashboard renderize normalmente.
+function renderSection(containerId, fn) {
+  try {
+    fn();
+  } catch (err) {
+    console.error(`Falha ao renderizar "${containerId}":`, err);
+    const container = document.getElementById(containerId);
+    if (container) {
+      const notice = document.createElement("div");
+      notice.className = "chart-error";
+      notice.textContent = "Não foi possível carregar esta seção.";
+      container.replaceChildren ? container.replaceChildren(notice) : (container.innerHTML = "", container.appendChild(notice));
+    }
+  }
+}
+
+function showLoadError(message) {
+  const banner = document.getElementById("load-error");
+  banner.textContent = message;
+  banner.hidden = false;
+}
+
 async function loadDashboard() {
-  const response = await fetch("/api/dashboard");
-  const data = await response.json();
+  let data;
+  try {
+    const response = await fetch("/api/dashboard");
+    if (!response.ok) throw new Error(`Servidor respondeu ${response.status}`);
+    data = await response.json();
+  } catch (err) {
+    console.error("Falha ao buscar /api/dashboard:", err);
+    showLoadError(
+      "Não foi possível carregar os dados do dashboard. Confirme se o servidor Flask (python app.py) ainda está rodando e recarregue a página."
+    );
+    return;
+  }
 
   document.getElementById("generated-at").textContent = `Atualizado em ${fmtDateTime(data.gerado_em)}`;
-  renderStatus(data.status_plataformas);
-  renderKpis(data);
-  renderFunnelChart(data.funil_fechamento);
-  renderProspectingChart(data.prospeccao);
-  renderSalesChart(data.vendas);
-  renderRecovery(data.recuperacao_leads);
-  renderEmails(data.revisao_emails);
-  renderCalendar(data.calendario);
-  renderSalesTable(data.vendas);
-  renderLeadsTable(data.leads_recentes);
+
+  renderSection("platform-status", () => renderStatus(data.status_plataformas));
+  renderSection("kpi-row", () => renderKpis(data));
+  renderSection("chart-funnel", () => renderFunnelChart(data.funil_fechamento));
+  renderSection("chart-prospecting", () => renderProspectingChart(data.prospeccao));
+  renderSection("chart-sales", () => renderSalesChart(data.vendas));
+  renderSection("recovery-list", () => renderRecovery(data.recuperacao_leads));
+  renderSection("email-list", () => renderEmails(data.revisao_emails));
+  renderSection("calendar-list", () => renderCalendar(data.calendario));
+  renderSection("sales-table", () => renderSalesTable(data.vendas));
+  renderSection("leads-table", () => renderLeadsTable(data.leads_recentes));
 }
 
 loadDashboard();
